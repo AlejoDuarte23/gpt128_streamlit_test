@@ -10,8 +10,6 @@ import os
 os.environ["OPENAI_API_KEY"] = ""
 client = OpenAI()
 
-
-
 avatar_bot = Image.open(r"utils\logo_gold_Icon.png")
 avatar_user = Image.open(r"utils\logo_white_icon.png")
 

@@ -80,11 +80,8 @@ def init_page():
         unsafe_allow_html=True,
     )
     
-    logo_image = Image.open(r"utils\White_Logo_Black_text_Transparent.png")
-    st.image(logo_image, width=300, channels="RGB")
+ 
 
-    st.header("MinckaGPT")
-    st.sidebar.title("Options")
 
 
 def select_model():
@@ -95,8 +92,21 @@ def select_model():
     return temperature
 
 
-logo_image = Image.open(r"utils\White_Logo_Black_text_Transparent.png")
-st.image(logo_image, width=300, channels="RGB")
+# Load the image using PIL
+logo_image_path = "utils/Gold Logo White Text Transparent.png"
+logo_image = Image.open(logo_image_path)
+
+# Specify the desired width while maintaining the aspect ratio
+desired_width = 450
+aspect_ratio = desired_width / float(logo_image.size[0])
+new_height = int(float(logo_image.size[1]) * aspect_ratio)
+
+# Resize the image using high-quality resampling
+logo_image_resized = logo_image.resize((desired_width, new_height), Image.LANCZOS)
+
+# Display the resized image in Streamlit
+st.image(logo_image_resized, use_column_width=False, channels="RGB")
+
 
 st.header("MinckaGPT")
 st.sidebar.title("Options")
@@ -139,16 +149,20 @@ def save_conversation():
 
 def load_conversation(filename):
     """Loads a conversation from a given file."""
-    with open(filename, 'rb') as file:
+    with open(f"{filename}", 'rb') as file:
         return pickle.load(file)
 
 def display_saved_conversations():
     """Displays saved conversations in the sidebar for selection."""
-    saved_conversations = [f for f in os.listdir('conversations') if f.endswith('.pkl')]
+    
+    conversation_dir = 'conversations'
+    saved_conversations = [f for f in os.listdir(conversation_dir) if f.endswith('.pkl')]
+    # Sort files by last modification time, newest first
+    saved_conversations.sort(key=lambda x: os.path.getmtime(os.path.join(conversation_dir, x)), reverse=True)
     for file in saved_conversations:
-        if st.sidebar.button(file):
-            st.session_state.messages = load_conversation(f"conversations/{file}")
-
+        file_without_extension = file[:-4]
+        if st.sidebar.button(file_without_extension, use_container_width=True):
+            st.session_state.messages = load_conversation(os.path.join(conversation_dir, file))
 
 def get_last_user_message():
     """
